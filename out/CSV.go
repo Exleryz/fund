@@ -3,8 +3,8 @@ package out
 import (
 	"bufio"
 	"fmt"
+	"fund/dao/xq"
 	"fund/util"
-	"fund/xq"
 	"os"
 	"time"
 )

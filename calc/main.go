@@ -39,14 +39,15 @@ func main() {
 func calc(stock conf.StockConfig) decimal.Decimal {
 	switch stock.Type {
 	case conf.Fund:
-		service := service.FundService{}
+		fundService := service.NewFundService(conf.XueQiu)
+
 		// 获取对应 基金的 净值
 		if stock.Source == conf.TT {
 			// 天天
-			return stock.Count.Mul(service.GetPrice(stock.Code)).Truncate(2)
+			return stock.Count.Mul(fundService.GetPrice(stock.Code)).Truncate(2)
 		} else {
 			// 支付宝
-			return stock.Count.Mul(service.GetPrice(stock.Code)).Round(2)
+			return stock.Count.Mul(fundService.GetPrice(stock.Code)).Round(2)
 		}
 
 	}

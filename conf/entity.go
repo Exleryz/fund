@@ -2,6 +2,18 @@ package conf
 
 import "github.com/shopspring/decimal"
 
+// DataSource 数据来源
+type DataSource int
+
+const (
+	// XueQiu 雪球
+	XueQiu DataSource = iota
+	// JiSiLu 集思录
+	JiSiLu
+	// SINA 新浪
+	SINA
+)
+
 // AssetsType 资产类型
 type AssetsType int
 
