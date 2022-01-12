@@ -12,13 +12,14 @@ import (
 	"time"
 )
 
-// getCookies 获取cookie
-func getCookies(stockCode string) []*http.Cookie {
+// GetCookies 获取cookie
+func GetCookies(stockCode string) []*http.Cookie {
 	// todo 需要判断缓存失效
 	if v, ok := conf.CookiesCache["xueqiu"]; ok {
 		return v
 	}
 
+	// F 基金 S 股票/场内基金
 	urlStr := fmt.Sprintf("https://xueqiu.com/S/%s", stockCode)
 	request, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
@@ -72,11 +73,11 @@ func Xueqiu(stockCode, period string) {
 		fmt.Println(err.Error())
 		return
 	}
-	request.Header.Add("referer", "https://xq.com/S/SH513050")
+	request.Header.Add("referer", fmt.Sprintf("https://xq.com/S/%s", stockCode))
 	request.Header.Add("user-agent", conf.UA)
 
 	// 获取 & 添加cookie
-	cookies := getCookies(stockCode)
+	cookies := GetCookies(stockCode)
 	for _, v := range cookies {
 		request.AddCookie(v)
 	}
