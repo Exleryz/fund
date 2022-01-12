@@ -1,21 +1,19 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"fund/calc/entity"
 	"fund/conf"
+	"fund/service"
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
-	"net/http"
 )
 
-var holdConf *entity.HoldConfig
+var holdConf *conf.HoldConfig
 
 func init() {
-	holdConf = &entity.HoldConfig{}
+	holdConf = &conf.HoldConfig{}
 	readYml("conf/a.yml", holdConf)
 	log.Println(holdConf)
 }
@@ -38,48 +36,19 @@ func main() {
 	}
 }
 
-func calc(stock entity.StockConfig) decimal.Decimal {
+func calc(stock conf.StockConfig) decimal.Decimal {
 	switch stock.Type {
-	case 2:
+	case conf.Fund:
+		service := service.FundService{}
 		// 获取对应 基金的 净值
-		if stock.Source == "tt" {
+		if stock.Source == conf.TT {
 			// 天天
-			return stock.Count.Mul(getFundNetWorth(stock.Code)).Truncate(2)
+			return stock.Count.Mul(service.GetPrice(stock.Code)).Truncate(2)
 		} else {
 			// 支付宝
-			return stock.Count.Mul(getFundNetWorth(stock.Code)).Round(2)
+			return stock.Count.Mul(service.GetPrice(stock.Code)).Round(2)
 		}
 
 	}
 	return decimal.Decimal{}
-}
-
-func getFundNetWorth(code string) decimal.Decimal {
-	// https://fund.xueqiu.com/dj/open/fund/growth/008975?day=30
-	urlString := fmt.Sprintf("https://fund.xueqiu.com/dj/open/fund/growth/%s?day=30", code)
-	request, _ := http.NewRequest("GET", urlString, nil)
-	request.Header.Add("user-agent", conf.UA)
-	/*request.Header.Add("referer", fmt.Sprintf("https://xq.com/S/F%s", code))
-
-	// 获取 & 添加cookie
-	cookies := xq.GetCookies("F" + code)
-	for _, v := range cookies {
-		request.AddCookie(v)
-	}*/
-
-	client := &http.Client{}
-	do, err := client.Do(request)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	defer do.Body.Close()
-	all, err := ioutil.ReadAll(do.Body)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	respDto := &entity.FundResp{}
-	json.Unmarshal(all, respDto)
-
-	return respDto.Data.FundNavGrowth[len(respDto.Data.FundNavGrowth)-1].Nav
 }

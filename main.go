@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"fund/xq"
+	"fund/service"
 )
 
 var stockCode string
@@ -30,7 +30,7 @@ func main() {
 	fmt.Println("starting get: ", stockCode, Period)
 	// stockCode := "TSLA"
 
-	xq.Xueqiu(stockCode, Period)
+	service.GetCSVFile(stockCode, Period)
 	// https://stock.xueqiu.com/v5/stock/chart/minute.json?symbol=SH513050&period=1d
 	// https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SH513050&begin=1611851971895&period=day&type=before&count=-284&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance
 }
