@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"fund/conf"
+	"fund/dao"
 	"fund/dao/xq"
 	"fund/out"
 	"github.com/shopspring/decimal"
@@ -14,10 +15,16 @@ import (
 
 type StockService struct {
 	Period string
+	// 数据源
+	stockDao dao.StockDao
+}
+
+func NewStockService(dataSource conf.DataSource, period string) *StockService {
+	return &StockService{stockDao: dao.NewStockDao(dataSource, period)}
 }
 
 func (stockService *StockService) GetPrice(stockCode string) decimal.Decimal {
-	return decimal.Decimal{}
+	return stockService.stockDao.GetStockPrice(stockCode)
 }
 
 // GetCSVFile 雪球

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"fund/conf"
 	"fund/service"
@@ -11,10 +12,14 @@ import (
 )
 
 var holdConf *conf.HoldConfig
+var confFilePath *string
 
 func init() {
+	confFilePath = flag.String("c", "calc/conf/position.yml", "config file path, default: conf/position.yml")
+	flag.Parse()
+
 	holdConf = &conf.HoldConfig{}
-	readYml("conf/a.yml", holdConf)
+	readYml(*confFilePath, holdConf)
 	log.Println(holdConf)
 }
 
@@ -38,6 +43,11 @@ func main() {
 
 func calc(stock conf.StockConfig) decimal.Decimal {
 	switch stock.Type {
+	case conf.Stock:
+		// 	//period := "day"
+		//	//period:= "week"
+		stockService := service.NewStockService(conf.XueQiu, "day")
+		return stock.Count.Mul(stockService.GetPrice(stock.Code))
 	case conf.Fund:
 		fundService := service.NewFundService(conf.XueQiu)
 
