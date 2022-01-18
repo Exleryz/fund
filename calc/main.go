@@ -36,9 +36,33 @@ func readYml(filePath string, config interface{}) {
 }
 
 func main() {
-	for i, v := range holdConf.StockList {
-		fmt.Println(i, calc(v.Stock))
+	// 对数据进行整理求和
+	mapping := make(map[string]decimal.Decimal, len(holdConf.StockList))
+	for _, v := range holdConf.StockList {
+		calcDecimal := calc(v.Stock)
+		fmt.Println(v.Stock.Name, calcDecimal)
+
+		if value, ok := mapping[v.Stock.Code]; ok {
+			// 有值 需要添加
+			mapping[v.Stock.Code] = value.Add(calcDecimal)
+		} else {
+			mapping[v.Stock.Code] = calcDecimal
+		}
 	}
+
+	fmt.Println()
+
+	sum := decimal.Decimal{}
+	// 输出
+	for _, v := range holdConf.StockList {
+		if value, ok := mapping[v.Stock.Code]; ok {
+			sum = sum.Add(value)
+			fmt.Println(v.Stock.Name, value)
+			delete(mapping, v.Stock.Code)
+		}
+	}
+
+	fmt.Println(sum, "仍需努力")
 }
 
 func calc(stock conf.StockConfig) decimal.Decimal {
